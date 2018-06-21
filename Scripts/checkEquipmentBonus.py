@@ -32,15 +32,25 @@ class EquipmentBonusChecker(ScopeScanner):
         self.equipment_bonuses = []
 
     def actions_on_scope_start(self):
-        self.instant_found = False
+        pass
 
-    def actions_in_scope(self, line):
-        if not self.instant_found:
-            self.instant_found = 'instant' in line
+    def actions_in_scope(self):
+        if self.scope_level == 1:
+            equipment = self.line.strip(' \t\n\r').split(' ')[0]
+            if (equipment != '') & (equipment != '}'):
+                if 'instant' in self.line:
+                    self.instant_found = True
+                else:
+                    self.instant_found = False
+        elif self.scope_level == 2:
+            if 'instant' in self.line:
+                self.instant_found = True
 
-    def actions_on_end_of_scope(self, current_line, filename):
-        flagged_equipment_bonus = EquipmentBonus(current_line, filename)
-        self.equipment_bonuses += [flagged_equipment_bonus]
+    def actions_on_scope_level_change(self, change):
+        if (self.scope_level == 2) & (change == -1):
+            if not self.instant_found:
+                flagged_equipment_bonus = EquipmentBonus(self.current_line, self.filename)
+                self.equipment_bonuses += [flagged_equipment_bonus]
 
     def return_outputs(self):
         return self.equipment_bonuses
