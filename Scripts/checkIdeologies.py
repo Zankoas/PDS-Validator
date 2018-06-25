@@ -1,29 +1,43 @@
 import time
 from Scripts.fileScanner import FileScanner
-from Scripts.scopeScanner import ScopeScanner
+from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
+from Scripts.getAllFilenames import get_all_filenames
 
 
 def check_ideologies(path, output_file):
     t0 = time.time()
 
     ideology_references = find_references_to_ideologies(path)
-    ideologies = find_ideologies(path)
-    references_needing_ideology = check_if_reference_names_present_in_ideology_names(ideology_references, ideologies)
+    ideology_scopes = find_ideology_scopes(path)
+    ideologies = find_ideologies(ideology_scopes)
+    ideology_names = find_ideology_names(ideologies)
+    references_needing_ideology = check_if_reference_names_present_in_ideology_names(ideology_references, ideology_names)
 
     for reference in references_needing_ideology:
-        output_file.write("Ideology " + reference.name + " not defined at " + str(reference.line_number)
+        output_file.write("Ideology " + reference.body + " not defined at " + str(reference.starting_line)
                           + ' in ' + reference.filename + '\n')
 
     t0 = time.time() - t0
     print("Time taken for ideology reference script: " + (t0*1000).__str__() + " ms")
 
 
-def check_if_reference_names_present_in_ideology_names(ideology_references, ideologies):
+def find_ideology_names(ideologies):
+    ideology_names = []
+    for ideology in ideologies:
+        body = ideology.body.strip(' \n\t\r')
+        words = body.split(' ')
+        ideology_names += [words[0]]
+    return ideology_names
+
+
+def check_if_reference_names_present_in_ideology_names(ideology_references, ideology_names):
     references_needing_ideology = []
     for reference in ideology_references:
+        body_after_has_government = reference.body[reference.body.index('has_government')+17:]
+        reference_name = body_after_has_government.split(' ')[0].strip('\n\t\r}')
         ideology_defined = False
-        for ideology in ideologies:
-            if ideology == reference.name:
+        for ideology_name in ideology_names:
+            if ideology_name == reference_name:
                 ideology_defined = True
         if not ideology_defined:
             references_needing_ideology += [reference]
@@ -32,54 +46,36 @@ def check_if_reference_names_present_in_ideology_names(ideology_references, ideo
 
 def find_references_to_ideologies(path):
     subpaths = ['\\common', '\\events', '\\history']
+    scope = 'has_government'
+    ideology_references = []
+    for subpath in subpaths:
+        ideology_reference_finder = IdeologyReferenceFinder(scope)
+        ideology_references += ideology_reference_finder.from_path(path+subpath)
+    return ideology_references
 
-    ideology_reference_finder = IdeologyReferenceFinder(path, subpaths)
-    return ideology_reference_finder.scan_files()
+
+def find_ideologies(ideology_scopes):
+    ideologies = []
+    ideology_extractor = ScopeExtractorByScopeLevel(1)
+    for ideology_scope in ideology_scopes:
+        ideologies_in_this_scope = ideology_extractor.from_string(ideology_scope.body, ideology_scope.filename)
+        for ideology in ideologies_in_this_scope:
+            ideology.starting_line += ideology_scope.starting_line - 1
+        ideologies += ideologies_in_this_scope
+    return ideologies
 
 
-def find_ideologies(path):
-    subpath = ['\\common\\ideologies']
+def find_ideology_scopes(path):
+    subpath = '\\common\\ideologies'
     scope = 'ideologies'
+    full_path = path + subpath
 
-    ideology_finder = IdeologyFinder(path, subpath, scope=scope)
-    return ideology_finder.scan_files()
-
-
-class IdeologyFinder(ScopeScanner):
-
-    def initialize_additional_variables(self):
-        self.ideologies = []
-
-    def actions_in_scope(self):
-        ideology_name = self.line.strip(' \t\n\r').split(' ')[0]
-        if (ideology_name != '') & (ideology_name != '}'):
-            self.ideologies += [ideology_name]
-
-    def return_outputs(self):
-        return self.ideologies
+    ideology_scope_finder = ScopeExtractorByType(scope)
+    ideology_scopes = ideology_scope_finder.from_path(full_path)
+    return ideology_scopes
 
 
-class IdeologyReferenceFinder(FileScanner):
+class IdeologyReferenceFinder(ScopeExtractorByType):
 
-    def initialize_additional_variables(self):
-        self.ideology_references = []
-
-    def while_in_file(self):
-        if 'has_government' in self.line:
-            words = self.line.split(' ')
-            ideology_name = words[len(words) - 1]
-            ideology_name = ideology_name.strip(' \n\t\r')
-            if (ideology_name != '') & (ideology_name != '}'):
-                ideology_reference = IdeologyReference(ideology_name, self.filename, self.current_line)
-                self.ideology_references += [ideology_reference]
-
-    def return_outputs(self):
-        return self.ideology_references
-
-
-class IdeologyReference:
-
-    def __init__(self, name, filename, line_number):
-        self.name = name
-        self.filename = filename
-        self.line_number = line_number
+    def _extract_scope_body(self):
+        return self.line

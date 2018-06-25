@@ -17,9 +17,7 @@ from checkFocus import check_for_missing_focus
 from checkCores import check_for_missing_cores
 from checkEquipmentBonus import check_equipment_bonus
 from checkIdeologies import check_ideologies
-from checkAIChance import check_ai_chance
-from checkEventsForPictures import check_events_for_pictures
-
+from checkEvents import check_events
 
 # output file initialisation
 
@@ -38,8 +36,7 @@ def start(mod_path, hoi4_path):
     check_for_missing_cores(mod_path, output_file)
     check_equipment_bonus(mod_path, output_file)
     check_ideologies(mod_path, output_file)
-    check_ai_chance(mod_path, output_file)
-    check_events_for_pictures(mod_path, output_file)
+    check_events(mod_path, output_file)
     t0 = time.time() - t0
     print("Total time taken: " + (t0*1000).__str__() + " ms")
 

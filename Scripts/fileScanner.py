@@ -1,4 +1,4 @@
-from Scripts.getAllFilenamesIn import get_all_filenames_in
+from Scripts.getAllFilenames import get_all_filenames
 from Scripts.removeComments import remove_comments
 from Scripts.openFile import open_file
 
@@ -17,23 +17,23 @@ class FileScanner:
         self.initialize_additional_variables()
         for subpath in self.subpaths:
             path = self.path + subpath
-            filenames = get_all_filenames_in(path)
+            filenames = get_all_filenames(path)
             for self.filename in filenames:
                 self.before_opening_file()
 
-                file = open_file(self.filename)
-                line = file.readline()
-                self.line = remove_comments(line)
-                self.current_line = 1
+                self.file = open_file(self.filename)
+                self.line = self._get_next_line(self.file)
 
-                while line:
+                while self.line:
                     self.while_in_file()
 
-                    line = file.readline()
-                    self.line = remove_comments(line)
-                    self.current_line += 1
-
         return self.return_outputs()
+
+    def _get_next_line(self, file):
+        line = file.readline()
+        self.line = remove_comments(line)
+        self.current_line = 1
+        return line
 
     def initialize_additional_variables(self):
         # initialize any object variables that you need, such as output lists
