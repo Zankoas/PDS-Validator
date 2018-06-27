@@ -33,11 +33,9 @@ def find_ideology_names(ideologies):
 def check_if_reference_names_present_in_ideology_names(ideology_references, ideology_names):
     references_needing_ideology = []
     for reference in ideology_references:
-        body_after_has_government = reference.body[reference.body.index('has_government')+17:]
-        reference_name = body_after_has_government.split(' ')[0].strip('\n\t\r}')
         ideology_defined = False
         for ideology_name in ideology_names:
-            if ideology_name == reference_name:
+            if ideology_name == reference.body:
                 ideology_defined = True
         if not ideology_defined:
             references_needing_ideology += [reference]
@@ -51,6 +49,10 @@ def find_references_to_ideologies(path):
     for subpath in subpaths:
         ideology_reference_finder = IdeologyReferenceFinder(scope)
         ideology_references += ideology_reference_finder.from_path(path+subpath)
+    for reference in ideology_references:
+        body_after_has_government = reference.body[reference.body.index('has_government') + 17:]
+        reference_name = body_after_has_government.split(' ')[0].strip('\n\t\r}')
+        reference.body = reference_name
     return ideology_references
 
 
