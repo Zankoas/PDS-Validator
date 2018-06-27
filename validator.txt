@@ -8298,3 +8298,20 @@ No picture for event starting at 86 in C:\Users\Oscar Deaver\Documents\New_World
 No picture for event starting at 61 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_West_indies_federation.txt.
 No picture for event starting at 61 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_West_indies_federation.txt.
 No picture for event starting at 12 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_West_Russia.txt.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.
+Hidden event at 4 in C:\Users\Oscar Deaver\Documents\New_World_Order\events\TNO_RaidingEvents.txt has a picture but shouldn't.

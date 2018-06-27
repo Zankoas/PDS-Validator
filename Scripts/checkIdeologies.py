@@ -1,7 +1,5 @@
 import time
-from Scripts.fileScanner import FileScanner
 from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
-from Scripts.getAllFilenames import get_all_filenames
 
 
 def check_ideologies(path, output_file):
@@ -47,7 +45,7 @@ def find_references_to_ideologies(path):
     scope = 'has_government'
     ideology_references = []
     for subpath in subpaths:
-        ideology_reference_finder = IdeologyReferenceFinder(scope)
+        ideology_reference_finder = ScopeExtractorByType(scope)
         ideology_references += ideology_reference_finder.from_path(path+subpath)
     for reference in ideology_references:
         body_after_has_government = reference.body[reference.body.index('has_government') + 17:]
@@ -75,9 +73,3 @@ def find_ideology_scopes(path):
     ideology_scope_finder = ScopeExtractorByType(scope)
     ideology_scopes = ideology_scope_finder.from_path(full_path)
     return ideology_scopes
-
-
-class IdeologyReferenceFinder(ScopeExtractorByType):
-
-    def _extract_scope_body(self):
-        return self.line

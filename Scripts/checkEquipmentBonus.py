@@ -1,5 +1,4 @@
 import time
-from Scripts.getAllFilenames import get_all_filenames
 from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
 
 

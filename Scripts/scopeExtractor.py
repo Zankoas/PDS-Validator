@@ -1,4 +1,3 @@
-from Scripts.changeInScopeLevel import change_in_scope_level
 from Scripts.openFile import open_file
 from Scripts.getAllFilenames import get_all_filenames
 
@@ -37,10 +36,10 @@ class ScopeExtractor:
         indices_of_scope_endings = []
         for line_index in indices_of_lines_with_scope_start:
             index = line_index
-            scope_level = change_in_scope_level(self.lines[index])
+            scope_level = self.change_in_scope_level(self.lines[index])
             while scope_level > 0:
                 index += 1
-                scope_level += change_in_scope_level(self.lines[index])
+                scope_level += self.change_in_scope_level(self.lines[index])
             indices_of_scope_endings += [index]
         return indices_of_scope_endings
 
@@ -60,6 +59,16 @@ class ScopeExtractor:
         if not line_without_comments.endswith('\n'):
             line_without_comments += '\n'
         return line_without_comments
+
+    @staticmethod
+    def change_in_scope_level(line):
+        change = 0
+        for character in line:
+            if character == '{':
+                change += 1
+            elif character == '}':
+                change += -1
+        return change
 
 
 class ScopeExtractorByType(ScopeExtractor):
@@ -83,7 +92,7 @@ class ScopeExtractorByScopeLevel(ScopeExtractor):
             scope_name = line.strip(' \t\n\r').split(' ')[0]
             if (scope_name != '') & (scope_name != '}'):
                 scope_at_target_level_found = True
-        self.scope_level += change_in_scope_level(line)
+        self.scope_level += self.change_in_scope_level(line)
         return scope_at_target_level_found
 
 
