@@ -13,7 +13,7 @@ def check_events(path, output_file):
             flagged_event.starting_line) + ' in ' + flagged_event.filename + 'but there is only one option.\n')
 
     t0 = time.time() - t0
-    print("Time taken for AI chance script: " + (t0*1000).__str__() + " ms")
+    print("Time taken to check for events with single options with AI chances: " + (t0*1000).__str__() + " ms")
 
     t0 = time.time()
 
@@ -24,17 +24,30 @@ def check_events(path, output_file):
             flagged_event.starting_line) + ' in ' + flagged_event.filename + '.\n')
 
     t0 = time.time() - t0
-    print("Time taken for picture script: " + (t0 * 1000).__str__() + " ms")
+    print("Time taken to check events for pictures: " + (t0 * 1000).__str__() + " ms")
 
     t0 = time.time()
 
-    flagged_events = check_hidden_events_for_pictures(country_events)
+    hidden_events = filter_for_hidden_events(country_events)
 
+    flagged_events = filter_for_events_with_field(hidden_events, 'picture')
     for flagged_event in flagged_events:
-        output_file.write("Hidden event at " + str(
-            flagged_event.starting_line) + ' in ' + flagged_event.filename + ' has a picture but shouldn\'t.\n')
+        output_file.write("Hidden event at " + str(flagged_event.starting_line) + ' in ' + flagged_event.filename + ' has a picture.\n')
 
+    flagged_events = filter_for_events_with_field(hidden_events, 'title')
+    for flagged_event in flagged_events:
+        output_file.write("Hidden event at " + str(flagged_event.starting_line) + ' in ' + flagged_event.filename + ' has a title.\n')
 
+    flagged_events = filter_for_events_with_field(hidden_events, 'desc')
+    for flagged_event in flagged_events:
+        output_file.write("Hidden event at " + str(flagged_event.starting_line) + ' in ' + flagged_event.filename + ' has a description.\n')
+
+    flagged_events = filter_for_events_with_field(hidden_events, 'option')
+    for flagged_event in flagged_events:
+        output_file.write("Hidden event at " + str(flagged_event.starting_line) + ' in ' + flagged_event.filename + ' has options.\n')
+
+    t0 = time.time() - t0
+    print("Time taken to check that hidden events have no visible features: " + (t0 * 1000).__str__() + " ms")
 
 
 def check_events_for_single_uses_of_ai_chance(country_events):
@@ -46,12 +59,19 @@ def check_events_for_single_uses_of_ai_chance(country_events):
     return flagged_events
 
 
-def check_hidden_events_for_pictures(events):
-    flagged_events = []
+def filter_for_hidden_events(events):
+    hidden_events = []
     for event in events:
         if 'hidden = yes' in event.body:
-            if 'picture =' in event.body:
-                flagged_events += [event]
+            hidden_events += [event]
+    return hidden_events
+
+
+def filter_for_events_with_field(events, field_name):
+    flagged_events = []
+    for event in events:
+        if field_name + ' =' in event.body:
+            flagged_events += [event]
     return flagged_events
 
 
