@@ -31,7 +31,7 @@ def start(mod_path, hoi4_path):
     check_for_name_lists(mod_path, output_file)
     check_brackets(mod_path, output_file)
     check_for_double_locs(mod_path, output_file)
-    #check_for_missing_gfx(mod_path, output_file, hoi4_path)
+    check_for_missing_gfx(mod_path, output_file, hoi4_path)
     check_for_missing_focus(mod_path, output_file)
     check_for_missing_cores(mod_path, output_file)
     check_equipment_bonus(mod_path, output_file)
