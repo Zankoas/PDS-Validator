@@ -18,28 +18,33 @@ class ScopeExtractor:
 
     def from_string(self, string, filename):
         self.filename = filename
-        self.lines = string.split('\n')
-        for i in range(0, len(self.lines)-1):
-            self.lines[i] = self._remove_comments(self.lines[i])
+        self.contents_split_by_line = string.split('\n')
+        for i in range(0, len(self.contents_split_by_line) - 1):
+            self.contents_split_by_line[i] = self._remove_comments(self.contents_split_by_line[i])
         indices_of_lines_with_scope_start = self._find_scope_starting_indices()
         indices_of_scope_endings = self._find_scope_ending_indices(indices_of_lines_with_scope_start)
         return self.find_scopes_from_starting_and_ending_indices(indices_of_lines_with_scope_start, indices_of_scope_endings)
 
     def _find_scope_starting_indices(self):
         indices_of_lines_with_scope_start = []
-        for line in self.lines:
-            if self.check_for_scope(line):
-                indices_of_lines_with_scope_start += [self.lines.index(line)]
+        scope_level = 0
+        index = 1
+        for line in self.contents_split_by_line:
+            if scope_level == 0:
+                if self.check_for_scope(line):
+                    indices_of_lines_with_scope_start += [index]
+            scope_level += self.change_in_scope_level(line)
+            index += 1
         return indices_of_lines_with_scope_start
 
     def _find_scope_ending_indices(self, indices_of_lines_with_scope_start):
         indices_of_scope_endings = []
         for line_index in indices_of_lines_with_scope_start:
             index = line_index
-            scope_level = self.change_in_scope_level(self.lines[index])
-            while scope_level > 0:
+            scope_level = self.change_in_scope_level(self.contents_split_by_line[index - 1])
+            while (scope_level > 0) & (index < len(self.contents_split_by_line)):
                 index += 1
-                scope_level += self.change_in_scope_level(self.lines[index])
+                scope_level += self.change_in_scope_level(self.contents_split_by_line[index - 1])
             indices_of_scope_endings += [index]
         return indices_of_scope_endings
 
@@ -47,7 +52,7 @@ class ScopeExtractor:
         scopes = []
         for i in range(0, len(indices_of_lines_with_scope_start)):
             scope_line = indices_of_lines_with_scope_start[i]
-            body = self.lines[indices_of_lines_with_scope_start[i]:indices_of_scope_endings[i]+1]
+            body = self.contents_split_by_line[indices_of_lines_with_scope_start[i] - 1:indices_of_scope_endings[i]]
             scope_body = '\n'.join(body)
             scope = Scope(scope_line, self.filename, scope_body)
             scopes += [scope]
