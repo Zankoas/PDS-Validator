@@ -4,6 +4,7 @@ from Scripts.openFile import open_file
 from Scripts.getAllFilenames import get_all_filenames
 from Scripts.scope import Scope
 
+
 def check_events(path, output_file):
     t0 = time.time()
 
@@ -21,7 +22,6 @@ def check_events(path, output_file):
                 output_file.write("Hidden event at " + str(event.starting_line) + ' in ' + event.filename + ' has a description.\n')
             if 'option =' in event.body:
                 output_file.write("Hidden event at " + str(event.starting_line) + ' in ' + event.filename + ' has options.\n')
-
 
     t0 = time.time() - t0
     print("Time taken to check events for common errors: " + (t0*1000).__str__() + " ms")

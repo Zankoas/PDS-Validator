@@ -1,8 +1,11 @@
+from Scripts.removeComments import remove_comments
+
+
 class ScopeExtractor:
 
     def get_next_scope(self, string):
         contents_split_by_line_with_comments = string.split('\n')[0:-1]
-        self.contents_split_by_line = [self._remove_comments(line) for line in contents_split_by_line_with_comments]
+        self.contents_split_by_line = [remove_comments(line) for line in contents_split_by_line_with_comments]
         for starting_index in self._find_next_scope_starting_index():
             ending_index = self._find_scope_ending_index(starting_index)
             body = self._get_scope_from_starting_and_ending_indices(starting_index, ending_index)
@@ -28,15 +31,8 @@ class ScopeExtractor:
 
     def _get_scope_from_starting_and_ending_indices(self, start_index, end_index):
         body = self.contents_split_by_line[start_index-1:end_index]
-        scope_body = '\n'.join(body)
+        scope_body = ''.join(body)
         return scope_body
-
-    @staticmethod
-    def _remove_comments(line):
-        line_without_comments = line.split('#')[0]
-        if not line_without_comments.endswith('\n'):
-            line_without_comments += '\n'
-        return line_without_comments
 
     @staticmethod
     def change_in_scope_level(line):
@@ -58,17 +54,16 @@ class ScopeExtractorByType(ScopeExtractor):
         return self.scope_type in line
 
 
-class ScopeExtractorByScopeLevel(ScopeExtractor):
+class FieldExtractor(ScopeExtractor):
 
-    def __init__(self, scope_level):
-        self.target_scope_level = scope_level
+    def __init__(self):
         self.scope_level = 0
 
     def check_for_scope(self, line):
-        scope_at_target_level_found = False
-        if self.scope_level == self.target_scope_level:
+        field_found = False
+        if self.scope_level == 1:
             scope_name = line.strip(' \t\n\r').split(' ')[0]
             if (scope_name != '') & (scope_name != '}'):
-                scope_at_target_level_found = True
+                field_found = True
         self.scope_level += self.change_in_scope_level(line)
-        return scope_at_target_level_found
+        return field_found
