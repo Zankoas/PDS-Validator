@@ -1,5 +1,6 @@
 from codecs import open
 
+
 def open_file(path):
     file = open(path, 'r', 'utf-8-sig')
     try:
