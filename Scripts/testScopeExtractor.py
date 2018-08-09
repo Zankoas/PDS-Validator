@@ -1,16 +1,16 @@
 import unittest
 
-from Scripts.scopeExtractor import FieldExtractor, ScopeExtractorByType
+from Scripts.scopeExtractor import FieldExtractor, ScopeExtractor
 
 
 class TestScopeExtractorByType(unittest.TestCase):
 
     def setUp(self):
         scope = 'scope'
-        self.scope_extractor = ScopeExtractorByType(scope)
+        self.scope_extractor = ScopeExtractor(scope)
 
     def test_single_line_body(self):
-        expected_body = 'scope = { field = contents field = contents }\n'
+        expected_body = 'scope = { field = contents field = contents }'
 
         gen = self.scope_extractor.get_next_scope(expected_body)
         index, actual_body = next(gen)
@@ -27,7 +27,7 @@ class TestScopeExtractorByType(unittest.TestCase):
         self.assertEqual(expected_index, actual_index)
 
     def test_no_optional_spaces(self):
-        expected_body = 'scope={field=contents field=contents}\n'
+        expected_body = 'scope={field=contents field=contents}'
 
         gen = self.scope_extractor.get_next_scope(expected_body)
         index, actual_body = next(gen)
@@ -35,7 +35,7 @@ class TestScopeExtractorByType(unittest.TestCase):
         self.assertEqual(expected_body, actual_body)
 
     def test_multiline_body(self):
-        expected_body = 'scope = {\n field = contents\n field = contents\n }\n'
+        expected_body = 'scope = {\n field = contents\n field = contents\n }'
 
         gen = self.scope_extractor.get_next_scope(expected_body)
         index, actual_body = next(gen)
@@ -43,7 +43,7 @@ class TestScopeExtractorByType(unittest.TestCase):
         self.assertEqual(expected_body, actual_body)
 
     def test_nested_scope(self):
-        expected_body = 'scope = {\n field = {\n subfield = contents\n}\n}\n'
+        expected_body = 'scope = {\n field = {\n subfield = contents\n}\n}'
 
         gen = self.scope_extractor.get_next_scope(expected_body)
         index, actual_body = next(gen)
@@ -51,8 +51,8 @@ class TestScopeExtractorByType(unittest.TestCase):
         self.assertEqual(expected_body, actual_body)
 
     def test_remove_leading_lines(self):
-        body = 'other_line\nscope = {\n field = contents\n field = contents\n }\n'
-        expected_body = 'scope = {\n field = contents\n field = contents\n }\n'
+        body = 'other_line\nscope = {\n field = contents\n field = contents\n }'
+        expected_body = 'scope = {\n field = contents\n field = contents\n }'
 
         gen = self.scope_extractor.get_next_scope(body)
         index, actual_body = next(gen)
@@ -61,7 +61,7 @@ class TestScopeExtractorByType(unittest.TestCase):
 
     def test_remove_trailing_lines(self):
         body = 'scope = {\n field = contents\n field = contents\n }\nother_line\n'
-        expected_body = 'scope = {\n field = contents\n field = contents\n }\n'
+        expected_body = 'scope = {\n field = contents\n field = contents\n }'
 
         gen = self.scope_extractor.get_next_scope(body)
         index, actual_body = next(gen)

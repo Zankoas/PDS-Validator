@@ -1,57 +1,70 @@
+import bisect
+
 from Scripts.removeComments import remove_comments
 
 
 class ScopeExtractor:
 
-    def get_next_scope(self, string):
-        contents_split_by_line_with_comments = string.split('\n')[0:-1]
-        self.contents_split_by_line = [remove_comments(line) for line in contents_split_by_line_with_comments]
-        for starting_index in self._find_next_scope_starting_index():
-            ending_index = self._find_scope_ending_index(starting_index)
-            body = self._get_scope_from_starting_and_ending_indices(starting_index, ending_index)
-            yield starting_index, body
-
-    def _find_next_scope_starting_index(self):
-        scope_level = 0
-        index = 1
-        for line in self.contents_split_by_line:
-            if scope_level == 0:
-                if self.check_for_scope(line):
-                    yield index
-            scope_level += self.change_in_scope_level(line)
-            index += 1
-
-    def _find_scope_ending_index(self, index_of_scope_start):
-        index = index_of_scope_start
-        scope_level = self.change_in_scope_level(self.contents_split_by_line[index - 1])
-        while (scope_level > 0) & (index < len(self.contents_split_by_line)):
-            index += 1
-            scope_level += self.change_in_scope_level(self.contents_split_by_line[index - 1])
-        return index
-
-    def _get_scope_from_starting_and_ending_indices(self, start_index, end_index):
-        body = self.contents_split_by_line[start_index-1:end_index]
-        scope_body = ''.join(body)
-        return scope_body
-
-    @staticmethod
-    def change_in_scope_level(line):
-        change = 0
-        for character in line:
-            if character == '{':
-                change += 1
-            elif character == '}':
-                change += -1
-        return change
-
-
-class ScopeExtractorByType(ScopeExtractor):
-
     def __init__(self, scope_type):
         self.scope_type = scope_type
 
-    def check_for_scope(self, line):
-        return self.scope_type in line
+    def get_next_scope(self, string):
+        contents_split_by_line_with_comments = string.split('\n')[0:-1]
+        contents_split_by_line = [remove_comments(line) for line in contents_split_by_line_with_comments]
+        contents = ''.join(contents_split_by_line)
+        indices_of_new_lines = self._find_indices_of_new_lines(contents)
+        for starting_index in self._generate_scope_starting_indices(contents):
+            ending_index = self._find_scope_ending_index(starting_index, contents)
+            starting_line = bisect.bisect(indices_of_new_lines, starting_index) + 1
+            body = contents[starting_index:ending_index+1]
+            yield starting_line, body
+
+    def _generate_scope_starting_indices(self, contents):
+        index = 0
+        try:
+            while True:
+                index = contents.index(self.scope_type, index)
+                yield index
+        except ValueError:
+            pass
+
+    def _find_scope_ending_index(self, index_of_scope_start, contents):
+        index = index_of_scope_start
+        while contents[index] != '=':
+            index += 1
+        index += 1
+        while contents[index] == ' ' or contents[index] == '\n':
+            index += 1
+        if contents[index] == '{':
+            scope_level = 1
+            index += 1
+            while (scope_level > 0) & (index < len(contents)):
+                index += 1
+                scope_level += self.change_in_scope_level(contents[index])
+        else:
+            while contents[index] != ' ' and contents[index] != '\n':
+                index += 1
+        return index
+
+    def _find_indices_of_new_lines(self, contents):
+        new_line_indices = []
+        index = 0
+        try:
+            while True:
+                index = contents.index(self.scope_type, index+1)
+                new_line_indices += [index]
+        except ValueError:
+            return new_line_indices
+
+    @staticmethod
+    def change_in_scope_level(character):
+        if character == '{':
+            change = 1
+        elif character == '}':
+            change = -1
+        else:
+            change = 0
+        return change
 
 
 class FieldExtractor(ScopeExtractor):
