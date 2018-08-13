@@ -17,10 +17,8 @@ def find_next_equipment_bonus(path):
     scope_type = 'equipment_bonus'
     full_path = path + subpath
 
-    eq_bonus_scope_extractor = ScopeExtractorByType(scope_type)
-    eq_bonus_extractor = ScopeExtractorByScopeLevel(1)
     for filename in get_all_filenames(full_path):
         string = open_file(filename).read()
-        for equipment_bonus_scope in eq_bonus_scope_extractor.get_next_scope(string):
-            for index, equipment_bonus in eq_bonus_extractor.get_next_scope(equipment_bonus_scope.body, equipment_bonus_scope.filename):
+        for equipment_bonus_scope in ScopeExtractorByType(scope_type).get_next_scope(string):
+            for index, equipment_bonus in ScopeExtractorByScopeLevel(1).get_next_scope(equipment_bonus_scope.body, equipment_bonus_scope.filename):
                 yield Scope(filename, index, equipment_bonus)

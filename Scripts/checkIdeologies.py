@@ -31,11 +31,10 @@ def find_ideology_name(ideology):
 def find_next_reference_to_ideologies(path):
     subpaths = ['\\common', '\\events', '\\history']
     scope = 'has_government'
-    ideology_reference_finder = ScopeExtractorByType(scope)
     for subpath in subpaths:
         for filename in get_all_filenames(path + subpath):
             string = open_file(filename).read()
-            for index, reference in ideology_reference_finder.get_next_scope(string):
+            for index, reference in ScopeExtractorByType(scope).get_next_scope(string):
                 body_after_has_government = reference[reference.index('has_government') + 17:]
                 reference_name = body_after_has_government.split(' ')[0].strip('\n\t\r}')
                 yield Scope(filename, index, reference_name)
@@ -53,8 +52,7 @@ def find_next_ideology_scope(path):
     scope = 'ideologies'
     full_path = path + subpath
 
-    ideology_scope_finder = ScopeExtractorByType(scope)
     for filename in get_all_filenames(full_path):
         string = open_file(filename).read()
-        for start_line, body in ideology_scope_finder.get_next_scope(string):
+        for start_line, body in ScopeExtractorByType(scope).get_next_scope(string):
             yield Scope(filename, start_line, body)
