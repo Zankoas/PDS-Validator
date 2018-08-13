@@ -1,13 +1,11 @@
-import time
 from Scripts.scopeExtractor import ScopeExtractorByType
 from Scripts.openFile import open_file
 from Scripts.getAllFilenames import get_all_filenames
 from Scripts.scope import Scope
+from Scripts.timedFunction import timed_function
 
-
+@timed_function
 def check_events(path, output_file):
-    t0 = time.time()
-
     for event in find_next_country_event(path):
         if 'ai_chance' in event.body and event.body.count('option =') == 1:
             output_file.write("ai_chance present in event starting at " + str(event.starting_line) + ' in ' + event.filename + 'but there is only one option.\n')
@@ -22,9 +20,6 @@ def check_events(path, output_file):
                 output_file.write("Hidden event at " + str(event.starting_line) + ' in ' + event.filename + ' has a description.\n')
             if 'option =' in event.body:
                 output_file.write("Hidden event at " + str(event.starting_line) + ' in ' + event.filename + ' has options.\n')
-
-    t0 = time.time() - t0
-    print("Time taken to check events for common errors: " + (t0*1000).__str__() + " ms")
 
 
 def find_next_country_event(path):

@@ -1,20 +1,16 @@
-import time
 from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
 from Scripts.getAllFilenames import get_all_filenames
 from Scripts.openFile import open_file
 from Scripts.scope import Scope
+from Scripts.timedFunction import timed_function
 
+@timed_function
 def check_ideologies(path, output_file):
-    t0 = time.time()
-
     ideology_names = find_ideology_names_in_path(path)
 
     for reference in find_next_reference_to_ideologies(path):
         if reference.body not in ideology_names:
             output_file.write("Ideology " + reference.body + " not defined at " + str(reference.starting_line) + ' in ' + reference.filename + '\n')
-
-    t0 = time.time() - t0
-    print("Time taken for ideology reference script: " + (t0*1000).__str__() + " ms")
 
 
 def find_ideology_names_in_path(path):

@@ -1,19 +1,15 @@
-import time
-from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
 from Scripts.getAllFilenames import get_all_filenames
 from Scripts.openFile import open_file
 from Scripts.scope import Scope
+from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
+from Scripts.timedFunction import timed_function
 
 
+@timed_function
 def check_equipment_bonus(path, output_file):
-    t0 = time.time()
-
     for equipment_bonus in find_next_equipment_bonus(path):
         if 'instant' not in equipment_bonus.body:
             output_file.write("\'instant \' field missing from equipment bonus starting at " + str(equipment_bonus.starting_line) + ' in ' + equipment_bonus.filename + '\n')
-
-    t0 = time.time() - t0
-    print("Time taken for equipment bonus script: " + (t0*1000).__str__() + " ms")
 
 
 def find_next_equipment_bonus(path):
