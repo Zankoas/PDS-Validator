@@ -1,5 +1,6 @@
+import os
+
 from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
-from Scripts.getAllFilenames import get_all_filenames
 from Scripts.openFile import open_file
 from Scripts.scope import Scope
 from Scripts.timedFunction import timed_function
@@ -32,7 +33,7 @@ def find_next_reference_to_ideologies(path):
     subpaths = ['\\common', '\\events', '\\history']
     scope = 'has_government'
     for subpath in subpaths:
-        for filename in get_all_filenames(path + subpath):
+        for filename in os.walk(path + subpath):
             string = open_file(filename).read()
             for index, reference in ScopeExtractorByType(scope).get_next_scope(string):
                 body_after_has_government = reference[reference.index('has_government') + 17:]
@@ -52,7 +53,7 @@ def find_next_ideology_scope(path):
     scope = 'ideologies'
     full_path = path + subpath
 
-    for filename in get_all_filenames(full_path):
+    for filename in os.walk(full_path):
         string = open_file(filename).read()
         for start_line, body in ScopeExtractorByType(scope).get_next_scope(string):
             yield Scope(filename, start_line, body)

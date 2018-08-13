@@ -1,4 +1,5 @@
-from Scripts.getAllFilenames import get_all_filenames
+import os
+
 from Scripts.openFile import open_file
 from Scripts.scope import Scope
 from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
@@ -17,7 +18,7 @@ def find_next_equipment_bonus(path):
     scope_type = 'equipment_bonus'
     full_path = path + subpath
 
-    for filename in get_all_filenames(full_path):
+    for filename in os.walk(full_path):
         string = open_file(filename).read()
         for equipment_bonus_scope in ScopeExtractorByType(scope_type).get_next_scope(string):
             for index, equipment_bonus in ScopeExtractorByScopeLevel(1).get_next_scope(equipment_bonus_scope.body, equipment_bonus_scope.filename):
