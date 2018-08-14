@@ -2,11 +2,11 @@ from os import listdir
 from os import walk
 from os import path
 from codecs import open
-import time
 
+from Scripts.timedFunction import timed_function
 
+@timed_function
 def check_for_missing_gfx(file_path, output_file, hoi4_path):
-    t0 = time.time()
 
     # C:\Users\Martijn\Documents\Paradox Interactive\Hearts of Iron IV\mod\KRBU
     # this is going to be a mess
@@ -84,9 +84,6 @@ def check_for_missing_gfx(file_path, output_file, hoi4_path):
     check_a_lot(event_path, event_gfx_path,interface_path, file_path, output_file, hoi4_path, leaders_gfx_path, country_history_path, decisions_path, tree_path)
 
     focus_tree_icons(tree_path, hoi4_path, output_file, file_path, tree_gfx_path, interface_path)
-    t0 = time.time() - t0
-    print("GFX script Time: " + (t0*1000).__str__() + " ms")
-
 
 def fill_tag_array(internal_path, cosmetics):
     # 0 = just normal
@@ -127,17 +124,10 @@ def fill_tag_array(internal_path, cosmetics):
                 for string in lines:
                     if 'set_cosmetic_tag' in string and string.strip().startswith('#') is False and '{' not in string:
                         temp_string = string.split(' ')[2][:-2]
-                        if finddup(tags, temp_string) is False:
+                        if temp_string not in tags:
                             tags.append(temp_string)
                             #print("Found TAG: " + temp_string)
     return tags
-
-
-def finddup(array, string):
-    if string in array:
-        return True
-    else:
-        return False
 
 
 def hasideo(string, idarray):
@@ -173,17 +163,17 @@ def check_flags( flag_path, output_file, file_path):
         temp_string = file_name[:-4]
         if hasideo(temp_string, ideos) is True:
             temp_string = stripideo(temp_string, ideos)
-        if finddup(tag_array, temp_string) is False:
-            #print("No tag for " + file_name)
+        if temp_string not in tag_array:
+            # print("No tag for " + file_name)
             output_file.write("No (cosmetic) tag for " + file_name + "\n")
-        if finddup(flagarr, temp_string) is False:
+        if temp_string not in flagarr:
             flagarr.append(temp_string)
-            #print(temp_string)
+            # print(temp_string)
     tag_array = fill_tag_array(file_path, 0)
     for strings in tag_array:
-        if finddup(flagarr, strings) is False:
+        if strings not in flagarr:
             output_file.write("No flag for " + strings + "\n")
-            #print("No flag for " + strings)
+            # print("No flag for " + strings)
 
 
 def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_file, hoi4path, leaders_gfx_path, country_history_path, decisions_path, tree_path):
@@ -196,7 +186,7 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
         for filename in filenames:
             #temp_string = path.join(root, filename)[len(file_path)+1:].replace('\\','/')
             temp_string = filename
-            if finddup(actual_found_portrait_gfx, temp_string) is False:
+            if temp_string not in actual_found_portrait_gfx:
                 actual_found_portrait_gfx.append(temp_string)
                 actual_found_portrait_gfx_lower.append((temp_string.lower()))
                 actual_amount.append(1)
@@ -211,7 +201,7 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
         for filename in filenames:
             #temp_string = path.join(root, filename)[len(file_path)+1:].replace('\\','/')
             temp_string = filename
-            if finddup(actual_found_portrait_gfx, temp_string) is False:
+            if temp_string not in actual_found_portrait_gfx:
                 #print("Found Leader Portrait: " + temp_string)
                 actual_found_portrait_gfx.append(temp_string)
                 actual_found_portrait_gfx_lower.append((temp_string.lower()))
@@ -243,7 +233,7 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
                     temp_string = line.strip()
                     if '.tga' in temp_string or '.dds' in temp_string:
                         temp_string = temp_string.split('=')[1].replace('"', '')
-                        if finddup(leader_picture, temp_string) is False:
+                        if temp_string not in leader_picture:
                             temp_string = strip_and_clean(temp_string)
                             #print(temp_string)
                             leader_picture.append(temp_string)
@@ -252,8 +242,8 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
                             index = leader_picture.index(temp_string)
                             amount = amountarr[index] + 1
                             amountarr[index] = amount
-                        if finddup(actual_found_portrait_gfx, temp_string) is False:
-                            if finddup(actual_found_portrait_gfx_lower, temp_string.lower()) is True:
+                        if temp_string not in actual_found_portrait_gfx:
+                            if temp_string.lower() in actual_found_portrait_gfx_lower:
                                 #print("Wrongly spelled portrait: " + temp_string + " in file " + dir.split('\\')[len(dir.split('\\'))-1] + "\\" + file_name + " at line " + line_number.__str__())
                                 output_file.write("Wrongly spelled portrait: " + temp_string + " in  file " + dir.split('\\')[len(dir.split( '\\')) - 1] + "\\" + file_name + " at line " + line_number.__str__() + "\n")
                             else:
@@ -261,14 +251,13 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
                                 output_file.write("Didnt find portrait: " + temp_string + " in  file " + dir.split('\\')[len(dir.split('\\')) - 1] + "\\" + file_name + " at line " + line_number.__str__() + "\n")
                     elif '"' not in temp_string:
                         temp_string = temp_string.split(' ')[2]
-                        if finddup(event_picture, temp_string) is False:
+                        if temp_string not in event_picture:
                             event_picture.append(temp_string)
                     else:
                         temp_string = temp_string.split('=')[1].replace('"', '').strip()
                         if temp_string != "" and "." not in temp_string:
                             #print("Incorrect or false negative gfx key of " + temp_string + " at line " + line_number.__str__() + " in file " + file_name)
                             output_file.write("Incorrect or false negative gfx key of " + temp_string + " at line " + line_number.__str__() + " in file " + file_name + "\n")
-
 
     #GFX Keys that arent used
     event_gfx_key = []
@@ -291,12 +280,12 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
                     if '#' in line:
                         line = line.split('#')[0].strip()
                     temp_string = line.split('"')[1].strip()
-                    if finddup(event_gfx_key, temp_string) is True:
+                    if temp_string in event_gfx_key:
                         #print("Duplicated gfx key " + temp_string +" in file " + file_name + " at line " + line_number.__str__())
                         output_file.write("Duplicated gfx key " + temp_string +" in file " + file_name + " at line " + line_number.__str__() + "\n")
                     else:
                         event_gfx_key.append(temp_string)
-                    if finddup(event_picture, temp_string) is False and vanilla == 0:
+                    if temp_string not in event_picture and vanilla == 0:
                         #print("Unused Gfx: " + temp_string + " at line " + line_number.__str__() + " in file " + file_name)
                         output_file.write("Unused event Gfx: " + temp_string + " at line " + line_number.__str__() + " in file " + file_name + "\n")
                 if "texturefile" in line and line.strip().startswith('#') is False:
@@ -321,7 +310,7 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
                     temp_string.replace('	', ' ')
                     temp_string = temp_string.split(' ')[2]
                     #print(temp_string)
-                    if finddup(event_gfx_key, temp_string) is False:
+                    if temp_string not in event_gfx_key:
                         output_file.write("GFX event key not found: " + temp_string + " at line " + line_number.__str__() + " in file " + file_name + "\n")
                         #print("GFX key not found: " + temp_string + " at line " + line_number.__str__() + " in file " + file_name)
 
@@ -330,12 +319,12 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
     for root, directories, filenames in walk(event_gfx_path):
         for filename in filenames:
             temp_string = path.join(root, filename)[len(file_path)+1:].replace('\\','/')
-            if finddup(actual_found_event_gfx, temp_string) is True:
+            if temp_string in actual_found_event_gfx:
                 #print("Duplicate event gfx: " + filename)
                 output_file.write("Duplicate event gfx: " + temp_string + "\n")
             else:
                 actual_found_event_gfx.append(temp_string)
-            if finddup(event_gfx_file_names_in_gfx_file, temp_string) is False:
+            if temp_string not in event_gfx_file_names_in_gfx_file:
                 output_file.write("GFX not used in any .gfx file: " + temp_string + "\n")
                 #print("GFX not used in any .gfx file: " + temp_string)
 
@@ -387,8 +376,8 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
                         line = line.split('#')[0].strip()
                     temp_string = line.split('=')[1].strip()
                     decisions_found.append(temp_string)
-                    if finddup(decisions_keys, temp_string) is False:
-                        if finddup(decisions_keys_full, temp_string) is False:
+                    if temp_string not in decisions_keys:
+                        if temp_string not in decisions_keys_full:
                             output_file.write("Didn't find icon decisions " + temp_string + " in file " + filename + " at " + line_number.__str__() + "\n")
                         else:
                             output_file.write("Key for decisions wronly written (did you add or remove GFX_categories/GFX decisions)" + temp_string + " in file " + filename + " at " + line_number.__str__() + "\n")
@@ -407,8 +396,8 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
                         line = line.split('#')[0].strip()
                     temp_string = line.split('=')[1].strip()
                     decisions_found.append(temp_string)
-                    if finddup(decisions_keys, temp_string) is False:
-                        if finddup(decisions_keys_full, temp_string) is False:
+                    if temp_string not in decisions_keys:
+                        if temp_string not in decisions_keys_full:
                             output_file.write("Didn't find icon decisions/ Wrong type used " + temp_string + " in file " + filename + " at " + line_number.__str__() + ". Did you forget to add categories_ to the icon name?\n")
                             #print("Didn't find icon decisions " + temp_string + " in file " + filename + " at " + line_number.__str__())
             if 'picture' in line:
@@ -417,7 +406,7 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
                         line = line.split('#')[0].strip()
                     temp_string = line.split('=')[1].strip()
                     decisions_found.append(temp_string)
-                    if finddup(decisions_keys_full, temp_string) is False:
+                    if temp_string not in decisions_keys_full:
                         output_file.write("Didn't find icon decisions/ Wrong type used " + temp_string + " in file " + filename + " at " + line_number.__str__() + ". Did you forget to add categories_ to the icon name?\n")
                         #print("Didn't find picture decisions " + temp_string + " in file " + filename + " at " + line_number.__str__())
 
@@ -434,8 +423,8 @@ def check_a_lot(event_path, event_gfx_path, interface_path, file_path, output_fi
                     if line.strip().startswith('#') is False:
                         temp_string = line.split('\"')[1].strip()
                         #temp_string = temp_string[13:]
-                        if finddup(decisions_found, temp_string) is False:
-                            if finddup(decisions_found, temp_string[13:]) is False:
+                        if temp_string not in decisions_found:
+                            if temp_string[13:] not in decisions_found:
                                 #print("Found Unused KR Decision GFX " + temp_string + " in " + filenames)
                                 output_file.write("Found Unused KR Decision GFX " + temp_string + " in " + filenames + "\n")
 
@@ -478,18 +467,18 @@ def focus_tree_icons(tree_path, hoi4_path, output_file, mod_path, tree_gfx, gfx_
                             continue
                         temp_string = temp_string.split('/')[len(temp_string.split('/'))-1]
                     goals_files_needed.append(temp_string[:len(temp_string)-4])
-                    if finddup(tree_gfx_files, temp_string) is False:
+                    if temp_string not in tree_gfx_files:
                         if 'tga' in temp_string:
-                            if finddup(tree_gfx_files, temp_string.replace('tga', 'dds')) is False:
+                            if temp_string.replace('tga', 'dds') not in tree_gfx_files:
                                 #print("Could not find " + temp_string + " in the gfx/interface/goals folder")
                                 output_file.write("Could not find " + temp_string + " in the gfx/interface/goals folder\n")
                         elif 'dds' in temp_string:
-                            if finddup(tree_gfx_files, temp_string.replace('dds', 'tga')) is False:
+                            if temp_string.replace('dds', 'tga') not in tree_gfx_files:
                                 #print("Could not find " + temp_string + " in the gfx/interface/goals folder")
                                 output_file.write("Could not find " + temp_string + " in the gfx/interface/goals folder\n")
 
     for filename in tree_gfx_files:
-        if finddup(goals_files_needed, filename[:len(filename)-4]) is False:
+        if filename[:len(filename)-4] not in goals_files_needed:
             #print("Found focus texture not used " + filename[:len(filename)-4])
             output_file.write("Found focus texture not used " + filename[:len(filename)-4] + "\n")
 
@@ -530,9 +519,9 @@ def focus_tree_icons(tree_path, hoi4_path, output_file, mod_path, tree_gfx, gfx_
                 if line.strip() is not "":
                     line = line.split('=')[1].strip()
                     found_gfx_in_tree.append(line)
-                    if finddup(gfx_names, line) is False:
+                    if gfx_names not in line:
                         output_file.write("Found focus icon \"" + line + "\" not declared in " + filename + " in line: " + line_number.__str__() +"\n")
 
     for string in kr_gfx_names:
-        if finddup(found_gfx_in_tree, string) is False:
+        if string not in found_gfx_in_tree:
             output_file.write("Found focus icon never used in any focus tree: " + string + "\n")
