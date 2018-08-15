@@ -1,6 +1,6 @@
 import unittest
 
-from Scripts.scopeExtractor import FieldExtractor, ScopeExtractor
+from Scripts.scopeExtractor import ScopeExtractor
 
 
 class TestScopeExtractorByType(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestScopeExtractorByType(unittest.TestCase):
         self.assertEqual(expected_body, actual_body)
 
     def test_single_line_index(self):
-        body = 'scope = { field = contents field = contents }\n'
+        body = 'scope = { field = contents field = contents }'
         expected_index = 1
 
         gen = self.scope_extractor.get_next_scope(body)
@@ -60,7 +60,7 @@ class TestScopeExtractorByType(unittest.TestCase):
         self.assertEqual(expected_body, actual_body)
 
     def test_remove_trailing_lines(self):
-        body = 'scope = {\n field = contents\n field = contents\n }\nother_line\n'
+        body = 'scope = {\n field = contents\n field = contents\n }\nother_line'
         expected_body = 'scope = {\n field = contents\n field = contents\n }'
 
         gen = self.scope_extractor.get_next_scope(body)
@@ -69,7 +69,16 @@ class TestScopeExtractorByType(unittest.TestCase):
         self.assertEqual(expected_body, actual_body)
 
     def test_multiple_on_line(self):
-        body = 'field = contents scope = contents field = contents\n'
+        body = 'field = contents scope = contents field = contents'
+        expected_body = 'scope = contents'
+
+        gen = self.scope_extractor.get_next_scope(body)
+        index, actual_body = next(gen)
+
+        self.assertEqual(expected_body, actual_body)
+
+    def test_trailing_endline(self):
+        body = 'scope = contents\n'
         expected_body = 'scope = contents'
 
         gen = self.scope_extractor.get_next_scope(body)

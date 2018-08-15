@@ -9,7 +9,9 @@ class ScopeExtractor:
         self.scope_type = scope_type
 
     def get_next_scope(self, string):
-        contents_split_by_line_with_comments = string.split('\n')[0:-1]
+        contents_split_by_line_with_comments = string.split('\n')
+        while contents_split_by_line_with_comments[-1] == '':
+            contents_split_by_line_with_comments = contents_split_by_line_with_comments[0:-1]
         contents_split_by_line = [remove_comments(line) for line in contents_split_by_line_with_comments]
         contents = ''.join(contents_split_by_line)
         indices_of_new_lines = self._find_indices_of_new_lines(contents)
@@ -42,7 +44,7 @@ class ScopeExtractor:
                 index += 1
                 scope_level += self.change_in_scope_level(contents[index])
         else:
-            while contents[index] != ' ' and contents[index] != '\n':
+            while contents[index+1] != ' ' and contents[index+1] != '\n':
                 index += 1
         return index
 
