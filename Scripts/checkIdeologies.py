@@ -1,6 +1,6 @@
 import os
 
-from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
+from Scripts.scopeExtractor import ScopeExtractor
 from Scripts.openFile import open_file
 from Scripts.scope import Scope
 from Scripts.timedFunction import timed_function
@@ -44,7 +44,7 @@ def find_next_reference_to_ideologies(path):
 def find_next_ideology(ideology_scope):
     ideology_extractor = ScopeExtractorByScopeLevel(1)
     for starting_index, body in ideology_extractor.get_next_scope(ideology_scope.body):
-        starting_index += ideology_scope.starting_line - 1
+        starting_index += ideology_scope.index - 1
         yield Scope(ideology_scope.filename, starting_index, body)
 
 
@@ -55,5 +55,5 @@ def find_next_ideology_scope(path):
 
     for filename in os.walk(full_path):
         string = open_file(filename).read()
-        for start_line, body in ScopeExtractorByType(scope).get_next_scope(string):
+        for start_line, body in ScopeExtractor(scope).get_next_scope(string):
             yield Scope(filename, start_line, body)
