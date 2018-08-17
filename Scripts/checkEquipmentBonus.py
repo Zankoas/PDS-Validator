@@ -2,7 +2,7 @@ import os
 
 from Scripts.openFile import open_file
 from Scripts.scope import Scope
-from Scripts.scopeExtractor import ScopeExtractorByType, ScopeExtractorByScopeLevel
+from Scripts.generateScopes import generate_scopes
 from Scripts.timedFunction import timed_function
 
 
@@ -18,8 +18,9 @@ def find_next_equipment_bonus(path):
     scope_type = 'equipment_bonus'
     full_path = path + subpath
 
-    for dirpath, dirs, filename in os.walk(full_path):
-        string = open_file(dirpath + filename).read()
-        for equipment_bonus_scope in ScopeExtractorByType(scope_type).get_next_scope(string):
-            for index, equipment_bonus in ScopeExtractorByScopeLevel(1).get_next_scope(equipment_bonus_scope.body, equipment_bonus_scope.filename):
-                yield Scope(dirpath + filename, index, equipment_bonus)
+    for dirpath, dirs, filenames in os.walk(full_path):
+        for file in filenames:
+            string = open_file(dirpath + file).read()
+            for equipment_bonus_scope in ScopeExtractorByType(scope_type).get_next_scope(string):
+                for index, equipment_bonus in generate_scopes(equipment_bonus_scope.body):
+                    yield Scope(dirpath + file, index, equipment_bonus)

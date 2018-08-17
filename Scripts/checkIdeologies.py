@@ -1,9 +1,10 @@
 import os
 
-from Scripts.scopeExtractor import ScopeExtractor
+from Scripts.generateScopes import generate_scopes
 from Scripts.openFile import open_file
 from Scripts.scope import Scope
 from Scripts.timedFunction import timed_function
+
 
 @timed_function
 def check_ideologies(path, output_file):
@@ -17,8 +18,7 @@ def check_ideologies(path, output_file):
 def find_ideology_names_in_path(path):
     ideology_names = []
     for scope in find_next_ideology_scope(path):
-        for ideology in find_next_ideology(scope):
-            ideology_names += [find_ideology_name(ideology)]
+        ideology_names += [ideology_name for ideology_name in find_next_ideology_name(scope)]
     return ideology_names
 
 
@@ -41,11 +41,10 @@ def find_next_reference_to_ideologies(path):
                 yield Scope(dirpath + filename, index, reference_name)
 
 
-def find_next_ideology(ideology_scope):
-    ideology_extractor = ScopeExtractorByScopeLevel(1)
-    for starting_index, body in ideology_extractor.get_next_scope(ideology_scope.body):
+def find_next_ideology_name(ideology_scope):
+    for starting_index, name, body in generate_scopes(ideology_scope.body):
         starting_index += ideology_scope.index - 1
-        yield Scope(ideology_scope.filename, starting_index, body)
+        yield name
 
 
 def find_next_ideology_scope(path):

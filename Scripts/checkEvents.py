@@ -1,6 +1,6 @@
 import os
 
-from Scripts.scopeExtractor import ScopeExtractorByType
+from Scripts.generateScopes import ScopeExtractorByType
 from Scripts.openFile import open_file
 from Scripts.scope import Scope
 from Scripts.timedFunction import timed_function
