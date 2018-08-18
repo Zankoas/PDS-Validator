@@ -40,7 +40,6 @@ def find_next_ideology_name(ideology_scope):
 def find_next_ideology_scope(path):
     subpath = '\\common\\ideologies'
     scope = 'ideologies'
-
     for filename in generate_filenames(path, subpath):
         string = open_file(filename).read()
         yield from generate_scopes(string, generate_scope_indices_by_type, scope)
