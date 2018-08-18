@@ -1,9 +1,10 @@
-import os
-
 from Scripts.openFile import open_file
-from Scripts.scope import Scope
+from Scripts.scope import ScopeWithFilename
 from Scripts.generateScopes import generate_scopes
+from Scripts.generateScopeIndicesByType import generate_scope_indices_by_type
+from Scripts.testGenerateTopLevelScopes import generate_top_level_scope_indices
 from Scripts.timedFunction import timed_function
+from Scripts.generateFilenames import generate_filenames
 
 
 @timed_function
@@ -16,11 +17,8 @@ def check_equipment_bonus(path, output_file):
 def find_next_equipment_bonus(path):
     subpath = '\\common\\ideas'
     scope_type = 'equipment_bonus'
-    full_path = path + subpath
-
-    for dirpath, dirs, filenames in os.walk(full_path):
-        for file in filenames:
-            string = open_file(dirpath + file).read()
-            for equipment_bonus_scope in ScopeExtractorByType(scope_type).get_next_scope(string):
-                for index, equipment_bonus in generate_scopes(equipment_bonus_scope.body):
-                    yield Scope(dirpath + file, index, equipment_bonus)
+    for file in generate_filenames(path, subpath):
+        string = open_file(file).read()
+        for equipment_bonus_scope in generate_scopes(string, generate_scope_indices_by_type, scope_type):
+            for scope in generate_scopes(equipment_bonus_scope.body, generate_top_level_scope_indices):
+                yield ScopeWithFilename(file, scope)

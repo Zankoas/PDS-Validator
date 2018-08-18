@@ -1,9 +1,9 @@
-import os
-
-from Scripts.generateScopes import ScopeExtractorByType
+from Scripts.generateScopes import generate_scopes
+from Scripts.generateScopeIndicesByType import generate_scope_indices_by_type
 from Scripts.openFile import open_file
-from Scripts.scope import Scope
+from Scripts.scope import ScopeWithFilename
 from Scripts.timedFunction import timed_function
+from Scripts.generateFilenames import generate_filenames
 
 
 @timed_function
@@ -27,7 +27,7 @@ def check_events(path, output_file):
 def find_next_country_event(path):
     subpath = '\\events'
     scope = 'country_event'
-    for dirpath, dirs, filename in os.walk(path + subpath):
-        string = open_file(dirpath + filename).read()
-        for index, event in ScopeExtractorByType(scope).get_next_scope(string):
-            yield Scope(dirpath + filename, index, event)
+    for filename in generate_filenames(path, subpath):
+        string = open_file(filename).read()
+        for scope in generate_scopes(string, generate_scope_indices_by_type, scope):
+            yield ScopeWithFilename(filename, scope)

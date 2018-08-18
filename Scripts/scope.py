@@ -1,3 +1,4 @@
 from collections import namedtuple
 
-Scope = namedtuple('Scope', 'filename start_line body')
+Scope = namedtuple('Scope', 'start_line name body')
+ScopeWithFilename = namedtuple('ScopeWithFilename', )

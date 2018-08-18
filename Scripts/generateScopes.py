@@ -1,6 +1,7 @@
 import bisect
 
 from Scripts.removeComments import remove_comments
+from Scripts.scope import Scope
 
 
 def generate_scopes(string, scope_index_generator, *args):
@@ -14,7 +15,7 @@ def generate_scopes(string, scope_index_generator, *args):
         starting_line = bisect.bisect(indices_of_new_lines, starting_index) + 1
         body = contents[starting_index:ending_index+1]
         name, body = parse_scope(body)
-        yield starting_line, name, body
+        yield Scope(starting_line, name, body)
 
 
 def parse_scope(contents):
